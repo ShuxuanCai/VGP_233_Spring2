@@ -13,7 +13,7 @@ public class EnemyX : MonoBehaviour
     void Start()
     {
         enemyRb = GetComponent<Rigidbody>();
-        playerGoal = GameObject.Find("Player");
+        playerGoal = GameObject.Find("Player Goal");
         SpawnManagerx = GameObject.Find("Spawn Manager").GetComponent<SpawnManagerX>();
         speed = SpawnManagerx.enemySpeed;
     }
