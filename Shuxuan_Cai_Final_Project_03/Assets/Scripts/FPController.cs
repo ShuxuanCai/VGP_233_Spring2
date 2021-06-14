@@ -14,6 +14,7 @@ public class FPController : MonoBehaviour
     public Animator anim;
     public AudioSource shot;
     public GameObject bloodPrefeb;
+    public ParticleSystem muzzleFlash;
 
     public GameObject uiBloodPrefab;
     public GameObject gameOverPrefeb;
@@ -29,10 +30,6 @@ public class FPController : MonoBehaviour
     float minX = -90;
     float maxX = 90;
 
-    //float x;
-    //float z;
-
-    //Inventory
     int ammo = 50;
     int maxAmmo = 50;
     float health = 100.0f;
@@ -142,7 +139,6 @@ public class FPController : MonoBehaviour
         }
     }
 
-    public ParticleSystem muzzleFlash;
     // Update is called once per frame
     void Update()
     {

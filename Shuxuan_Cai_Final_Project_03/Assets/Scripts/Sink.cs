@@ -17,7 +17,7 @@ public class Sink : MonoBehaviour
 
     public void StartSink()
     {
-        destroyHeight = /*Terrain.activeTerrain.SampleHeight(*/this.transform.position.y/*)*/ - 5;
+        destroyHeight = this.transform.position.y - 5;
         Collider[] colList = this.transform.GetComponentsInChildren<Collider>();
         foreach(Collider c in colList)
         {
