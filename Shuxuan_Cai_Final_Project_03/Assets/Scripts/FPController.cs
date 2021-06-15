@@ -83,12 +83,6 @@ public class FPController : MonoBehaviour
 
     public void SaveHighScore()
     {
-        ////scoreText.text = score.ToString();
-        //if (PlayerPrefs.GetInt("HighScore", 0) > score)
-        //{
-        //    //highScoreText.text = highScore.ToString();
-        //    PlayerPrefs.SetInt("HighScore", highScore);
-        //}
         if(score > PlayerPrefs.GetInt("HighScore", 0))
         {
             PlayerPrefs.SetInt("HighScore", score);
@@ -175,7 +169,6 @@ public class FPController : MonoBehaviour
 
                     score += 10;
                     scoreText.text = "Score: " + score;
-                    //highScoreText.text = "High Score: " + highScore;
                 }
             }
         }
