@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FPController : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class FPController : MonoBehaviour
     public Slider healthbar;
     public Text ammoReserves;
     public Text ammoClipAmount;
+    public Text scoreText;
+    public Text highScoreText;
     public Transform shotDirection;
     public Animator anim;
     public AudioSource shot;
@@ -20,6 +23,7 @@ public class FPController : MonoBehaviour
     public GameObject gameOverPrefeb;
     public GameObject winTextPrefeb;
     public GameObject canvas;
+    public Button restartButton;
 
     float cWidth;
     float cHeight;
@@ -32,10 +36,12 @@ public class FPController : MonoBehaviour
 
     int ammo = 50;
     int maxAmmo = 50;
-    float health = 100.0f;
+    public float health = 100.0f;
     float maxHealth = 100.0f;
     int ammoClip = 10;
     int ammoClipMax = 10;
+    int score = 0;
+    int highScore = 0;
 
     Rigidbody rb;
     CapsuleCollider capsule;
@@ -57,7 +63,6 @@ public class FPController : MonoBehaviour
 
         Destroy(bloodSplatter, 2.2f);
         
-        Debug.Log("Health: " + health);
         if(health <= 0)
         {
             Vector3 pos = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
@@ -69,32 +74,65 @@ public class FPController : MonoBehaviour
             GameObject gameOverText = Instantiate(gameOverPrefeb);
             gameOverText.transform.SetParent(canvas.transform);
             gameOverText.transform.localPosition = Vector3.zero;
+
+            ShowRestart();
+
+            SaveHighScore();
         }
+    }
+
+    public void SaveHighScore()
+    {
+        ////scoreText.text = score.ToString();
+        //if (PlayerPrefs.GetInt("HighScore", 0) > score)
+        //{
+        //    //highScoreText.text = highScore.ToString();
+        //    PlayerPrefs.SetInt("HighScore", highScore);
+        //}
+        if(score > PlayerPrefs.GetInt("HighScore", 0))
+        {
+            PlayerPrefs.SetInt("HighScore", score);
+            highScoreText.text = "High Score: " + score.ToString();
+        }
+    }
+
+    public void ShowRestart()
+    {
+        restartButton.gameObject.SetActive(true);
     }
 
     void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.tag == "Home")
+        if(col.gameObject.CompareTag("Home"))
         {
             Vector3 pos = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
             GameObject steve = Instantiate(stevePrefeb, pos, this.transform.rotation);
             steve.GetComponent<Animator>().SetTrigger("Dance");
             GameStats.gameOver = true;
             Destroy(this.gameObject);
-            GameObject winTextText = Instantiate(winTextPrefeb);
-            winTextText.transform.SetParent(canvas.transform);
-            winTextText.transform.localPosition = Vector3.zero;
+            GameObject winText = Instantiate(winTextPrefeb);
+            winText.transform.SetParent(canvas.transform);
+            winText.transform.localPosition = Vector3.zero;
+
+            ShowRestart();
+
+            SaveHighScore();
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        GameStats.gameOver = false;
+
         rb = this.GetComponent<Rigidbody>();
         capsule = this.GetComponent<CapsuleCollider>();
 
         cameraRot = cam.transform.localRotation;
         characterRot = this.transform.localRotation;
+
+        
+        highScoreText.text = "High Score: " + PlayerPrefs.GetInt("HighScore", 0).ToString();
 
         health = maxHealth;
         healthbar.value = health;
@@ -112,7 +150,7 @@ public class FPController : MonoBehaviour
         if (Physics.Raycast(shotDirection.position, shotDirection.forward, out hitInfo, 200))
         {
             GameObject hitZombie = hitInfo.collider.gameObject;
-            if (hitZombie.tag == "Zombie")
+            if (hitZombie.gameObject.CompareTag("Zombie"))
             {
                 GameObject blood = Instantiate(bloodPrefeb, hitInfo.point, Quaternion.identity);
                 blood.transform.LookAt(this.transform.position);
@@ -134,6 +172,10 @@ public class FPController : MonoBehaviour
                     {
                         hitZombie.GetComponent<ZombieController>().KillZombie();
                     }
+
+                    score += 10;
+                    scoreText.text = "Score: " + score;
+                    //highScoreText.text = "High Score: " + highScore;
                 }
             }
         }
@@ -154,7 +196,6 @@ public class FPController : MonoBehaviour
                 ammoClip--;
                 ammoClipAmount.text = ammoClip + "";
             }
-            Debug.Log("Ammo Left in clip: " + ammoClip);
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -166,8 +207,6 @@ public class FPController : MonoBehaviour
             ammoClip += ammoAvailable;
             ammoReserves.text = ammo + "";
             ammoClipAmount.text = ammoClip + "";
-            Debug.Log("Ammo Left: " + ammo);
-            Debug.Log("Ammo in clip: " + ammoClip);
         }
     }
 
@@ -223,23 +262,20 @@ public class FPController : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if(col.gameObject.tag == "Ammo" && ammo < maxAmmo)
+        if(col.gameObject.CompareTag("Ammo") && ammo < maxAmmo)
         {
             ammo = Mathf.Clamp(ammo + 10, 0, maxAmmo);
             ammoReserves.text = ammo + "";
-            Debug.Log("Ammo: " + ammo);
             Destroy(col.gameObject);
         }
 
-        else if (col.gameObject.tag == "MedKit" && health < maxHealth)
+        else if (col.gameObject.CompareTag("MedKit") && health < maxHealth)
         {
             health = Mathf.Clamp(health + 25, 0, maxHealth);
             healthbar.value = health;
-            Debug.Log("MedKit: " + health);
             Destroy(col.gameObject);
         }
     }
-
 
     public void SetCursorLock(bool value)
     {
