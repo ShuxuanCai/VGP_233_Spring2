@@ -15,7 +15,9 @@ public class FPController : MonoBehaviour
     public Text highScoreText;
     public Transform shotDirection;
     public Animator anim;
-    public AudioSource shot;
+    public AudioClip shot;
+    public AudioClip victory;
+    public AudioClip gameOver;
     public GameObject bloodPrefeb;
     public ParticleSystem muzzleFlash;
 
@@ -41,10 +43,10 @@ public class FPController : MonoBehaviour
     int ammoClip = 10;
     int ammoClipMax = 10;
     int score = 0;
-    int highScore = 0;
 
     Rigidbody rb;
     CapsuleCollider capsule;
+    private AudioSource audioSource;
 
     Quaternion cameraRot;
     Quaternion characterRot;
@@ -69,7 +71,11 @@ public class FPController : MonoBehaviour
             GameObject steve = Instantiate(stevePrefeb, pos, this.transform.rotation);
             steve.GetComponent<Animator>().SetTrigger("Death");
             GameStats.gameOver = true;
-            Destroy(this.gameObject);
+            audioSource.PlayOneShot(gameOver, 1.0f);
+            if (!audioSource.isPlaying)
+            {
+                Destroy(this.gameObject);
+            }
 
             GameObject gameOverText = Instantiate(gameOverPrefeb);
             gameOverText.transform.SetParent(canvas.transform);
@@ -103,7 +109,11 @@ public class FPController : MonoBehaviour
             GameObject steve = Instantiate(stevePrefeb, pos, this.transform.rotation);
             steve.GetComponent<Animator>().SetTrigger("Dance");
             GameStats.gameOver = true;
-            Destroy(this.gameObject);
+            audioSource.PlayOneShot(victory, 1.0f);
+            if (!audioSource.isPlaying)
+            {
+                Destroy(this.gameObject);
+            }
             GameObject winText = Instantiate(winTextPrefeb);
             winText.transform.SetParent(canvas.transform);
             winText.transform.localPosition = Vector3.zero;
@@ -117,6 +127,7 @@ public class FPController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         GameStats.gameOver = false;
 
         rb = this.GetComponent<Rigidbody>();
@@ -124,7 +135,6 @@ public class FPController : MonoBehaviour
 
         cameraRot = cam.transform.localRotation;
         characterRot = this.transform.localRotation;
-
         
         highScoreText.text = "High Score: " + PlayerPrefs.GetInt("HighScore", 0).ToString();
 
@@ -183,7 +193,7 @@ public class FPController : MonoBehaviour
             if (ammoClip > 0)
             {
                 anim.SetTrigger("fire");
-                shot.Play();
+                audioSource.PlayOneShot(shot, 1.0f);
                 muzzleFlash.Play();
                 ProcessZombieHit();
                 ammoClip--;
