@@ -190,7 +190,7 @@ public class FPController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             
-            if (ammoClip > 0)
+            if (ammoClip > 0 && health > 0)
             {
                 anim.SetTrigger("fire");
                 audioSource.PlayOneShot(shot, 1.0f);
